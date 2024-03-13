@@ -2,11 +2,17 @@ require './get_frame_info'
 
 # module TestModule
 
-  # def mytest
-  #   t = 'hello'
-  # end
+  def mytest
+    puts 'hello'
+    sleep(3)
+  end
 
 # end
+
+  def download_sleep track
+    duration = get_track_duration track
+    sleep(duration*0.03)
+  end
 
   def get_track track
     f = File.open(track, "r:binary")

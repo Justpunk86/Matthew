@@ -1,4 +1,5 @@
 require './get_info_file'
+require './get_io'
 require 'socket'
 
 # include TestModule
@@ -23,17 +24,37 @@ loop {
   # end
 
  
+  # tracks = Dir['/home/se/Documents/HDT RADIO ONE/tracks/*.mp3']
+
+  # tracks.each do |track|
+  #    # f = File.open(track)
+  #   # puts track
+  #   # download_sleep track
+  #   # duration = get_track_duration track
+  #   bytes = (get_track track) #f.read
+
+  #   # 
+  #   client.write bytes
+  #   client.sync = true
+
+  # end
+
+  # data = get_io
+  #  data.bytes do |b|
+  #   client.write b
+  #  end
+  
   tracks = Dir['/home/se/Documents/HDT RADIO ONE/tracks/*.mp3']
 
   tracks.each do |track|
-     # f = File.open(track)
-    duration = get_track_duration track
-    bytes = (get_track track) #f.read
-    client.write bytes
-    sleep(duration - 200)
-    client.puts duration
-     # client.write bytes
-  end
+    data = (get_track track)
+
+
+      client.write data
+      client.read
+      client.flush
+
+   end
 
  client.close
 }
