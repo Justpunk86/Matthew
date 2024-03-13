@@ -1,7 +1,7 @@
 require './get_info_file'
 require 'socket'
 
-include TestModule
+# include TestModule
 
 
 server = TCPServer.open 2000
@@ -22,17 +22,19 @@ loop {
     client.write "\r\n"
   # end
 
-
+ 
   tracks = Dir['/home/se/Documents/HDT RADIO ONE/tracks/*.mp3']
 
   tracks.each do |track|
-    f = File.open(track)
-    # bytes = f.read
-    # client.write bytes
-    client.puts mytest()
-    client.puts get_frame_info track
+     # f = File.open(track)
+    duration = get_track_duration track
+    bytes = (get_track track) #f.read
+    client.write bytes
+    sleep(duration - 200)
+    client.puts duration
+     # client.write bytes
   end
-  # client.puts response
+
  client.close
 }
  
