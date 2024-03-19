@@ -1,13 +1,22 @@
 require './get_frame_info'
 
-# module TestModule
+@playlist_dir = '/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3' 
+
+@tracks = []
+
+ # module TestModule
 
   def mytest
     puts 'hello'
     sleep(3)
   end
 
-# end
+
+def get_playlist
+  tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3' ]
+end
+
+ # end
 
   def download_sleep track
     duration = get_track_duration track
@@ -15,24 +24,42 @@ require './get_frame_info'
   end
 
   def get_track track
-    f = File.open(track, "r:binary")
-    # f = IO.binread(track)
-    data_file = f.read
-    f.close
+    start = 4096
+    step = 1044 * 40
+
+    # if(tracks.length != 0)
+
+    #   track = tracks.shift
+      f = File.open(track, "r:binary")
+      data_file = []
+      # f = File.open(track, "r:utf-8")
+      # f = IO.binread(track)
+      # data_file = f.read
+      
+    # else
+    #   data_file = nil
+    # end
+    
     # new_io = IO.new(1, "w")
     # data_file.bytes {|b| new_io.write b }
 
+    0.upto(10198) do |fr|
+        data_file[fr] = IO.read(f,step,start)
+        start += step
+    end
     
-     return data_file
+    f.close
+    
+    return data_file
   end
 
-  def get_track_duration track
+  def get_track_duration track_data
 
     # f = File.open(track, "r:binary")
 
-    data_file = get_track track
+    data_file = track_data
 
-    file_size = data_file.bytes.count
+    # file_size = data_file.bytes.count
     
     hash_props = get_audio_props data_file
 
@@ -54,9 +81,18 @@ require './get_frame_info'
 
 # include TestModule
 
- # @tracks = Dir['/home/se/Documents/HDT RADIO ONE/tracks/*.mp3']
+ # @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3']
+ # @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Red Hot Chili Peppers - 01 Under The Bridge (Album Version).mp3'] 
 
  #  @tracks.each do |track|
- #   get_track_duration track
+ #    arr = get_track track
+
+ #    n = 0
+ #    arr.each do |fr| 
+ #      n += 1
+ #      puts "#{n}:"
+ #      puts fr
+ #      break if n == 15
+ #    end
 
  #  end 

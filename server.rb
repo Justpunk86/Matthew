@@ -2,12 +2,27 @@ require './get_info_file'
 require './get_io'
 require 'socket'
 
-# include TestModule
 
+
+# @@stream_data = 
 
 server = TCPServer.open 2000
 
+# tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3']
+  # tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Red Hot Chili Peppers - 01 Under The Bridge (Album Version).mp3']
+
+class Playlist 
+  
+  @trackss = get_playlist  
+
+  def get_t
+    @trackss
+  end
+end
+
 loop {
+  
+
   client = server.accept
   # method, request_target, _http_version = client.gets.strip.split
   # headers = {}
@@ -23,40 +38,72 @@ loop {
     client.write "\r\n"
   # end
 
- 
-  # tracks = Dir['/home/se/Documents/HDT RADIO ONE/tracks/*.mp3']
+  # @tracks = Playlist.new.get_t
 
-  # tracks.each do |track|
-  #    # f = File.open(track)
-  #   # puts track
+  # while (@tracks.length != 0) do
+  # # tracks.each do |track|
+     
   #   # download_sleep track
-  #   # duration = get_track_duration track
-  #   bytes = (get_track track) #f.read
 
-  #   # 
-  #   client.write bytes
-  #   client.sync = true
+    if(@tracks.length != 0)
+    
+        
+      # data_track =  File.open(@tracks.shift, "r:binary")
+      data_track = get_track @tracks.shift
 
-  # end
+      n = 0
 
-  # data = get_io
-  #  data.bytes do |b|
-  #   client.write b
-  #  end
+      # client.write data_track.read(417600)
+      # client.flush
+          
+
+      data_track.each do |fr|
+        # puts fr
+        n += 1
+        client.write fr.to_s
+        client.flush
+        sleep(0.026)
+
+        break if n == 3
+      end
+
+      # start = 0
+      # offset = 4096
+      # # start = start + offset
+      # step = 1044
+     
+      # 1.upto(10199) do |fr|
+
+        
+
+      #   # puts fr
+      #    n += 1
+        
+      #   client.write IO.read(data_track,step,start+offset)
+      #    # puts IO.read(out,step,start)
+
+      #   client.flush
+      #   start += step
+      #   # start = offset + fr * step
+      #   sleep(0.026)
+      #   # puts "#{n += 1}"
+      #    break if n == 10
+      # end
+        
   
-  tracks = Dir['/home/se/Documents/HDT RADIO ONE/tracks/*.mp3']
+      # duration = get_track_duration data_track
+      # client.write "current_time = #{duration-100}"
+      # sleep(duration*0.03)
+    # end
 
-  tracks.each do |track|
-    data = (get_track track)
+  else
+    @tracks = get_playlist
+  end
 
-
-      client.write data
-      client.read
-      client.flush
-
-   end
-
- client.close
+    client.close
 }
+
+
+
  
 
