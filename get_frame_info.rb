@@ -1,16 +1,12 @@
 
 
 def get_audio_props f
-
-  # response = []
     
   id3v2_length = get_id3v2_length f
-  
   
   title_byte = ''
 
   # get first title
-  # title = IO.read(f,4,id3v2_length)
   title = f[id3v2_length..id3v2_length+4]
 
   # write title in binary format
@@ -31,52 +27,80 @@ def get_audio_props f
   res1[:id3v2_length] = id3v2_length
 
   res1
-
-  # response.push read_title title_byte
-  # response.push read_vbr f
-  # response.push read_id3v2 f
     
 end
-
-
 
 def get_id3v2_length f
 
   id3v2_title_length = 10
-
-  id3v2 = f[6..9]#IO.read(f,4,6)
-  id3v2_byte = id3v2.bytes.map {|b| "%b" % b }
+  vbr_offset = 32
+  frame_title_length = 4
   
-  id3v2_length = id3v2_byte.join("").to_i(2) + id3v2_title_length
+  # id3v2 = f[6..9]
+
+  # id3v2_byte = id3v2.bytes.map {|b| "%b" % b }
+  
+  # id3v2_length = id3v2_byte.join("").to_i(2) + id3v2_title_length
+  
+  vbr_type = check_vbr f
+
+  id3v2_length = f.index(vbr_type) -vbr_offset -frame_title_length
 
 end  
 
+def check_vbr track_data
+  vbr_type = ''
+  if track_data.include?('Xing')
+    vbr_type = 'Xing'
+  elsif track_data.include?('Info')
+    vbr_type = 'Info'
+  elsif track_data.include?('VBRI')
+    vbr_type = 'VBRI'
+  end
+end
+
 
 def read_vbr f
-  vbr_offset = 32
-  frame_title_length = 4
-  id3v2_length = get_id3v2_length f
+  # vbr_offset = 32
+  # frame_title_length = 4
+  # id3v2_length = get_id3v2_length f
 
-    vbr_start = id3v2_length + vbr_offset + frame_title_length
+  
+  vbr_type = check_vbr f
 
-    # read vbr
-    vbr_id = f[vbr_start..vbr_start+3]
-    #IO.read(f,4,vbr_start)
-    vbr_num_frames =  f[vbr_start+8..vbr_start+8+3]
-    # IO.read(f,4,vbr_start+8).
-                      .bytes
-                      .map {|b| "%b" % b }.
+  vbr_start = f.index(vbr_type)
+  # vbr_start = id3v2_length + vbr_offset + frame_title_length
+
+  # read vbr
+  vbr_id = f[vbr_start..vbr_start+3]
+
+  #TODO: доработка смещения в зависимости от типа VBR
+
+  if vbr_type != 'VBRI'
+  
+    vbr_num_frames =  f[vbr_start+8..vbr_start+8+3].
+                      bytes.
+                      map {|b| "%b" % b }.
                       join("").to_i(2)
-    vbr_num_bytes = f[vbr_start+12..vbr_start+12+3]
-    # IO.read(f,4,vbr_start+12).
-                      .bytes.map {|b| "%b" % b }.
+    vbr_num_bytes = f[vbr_start+12..vbr_start+12+3].
+                      bytes.map {|b| "%b" % b }.
                       join("").to_i(2)
+  else
+    
+    vbr_num_frames =  f[vbr_start+14..vbr_start+14+3].
+                      bytes.
+                      map {|b| "%b" % b }.
+                      join("").to_i(2)
+    vbr_num_bytes = f[vbr_start+10..vbr_start+10+3].
+                      bytes.map {|b| "%b" % b }.
+                      join("").to_i(2)    
+  end                                            
 
-    h = {
-        vbr_id: vbr_id,
-        vbr_num_frames: vbr_num_frames,
-        vbr_num_bytes: vbr_num_bytes
-    }
+  h = {
+      vbr_id: vbr_id,
+      vbr_num_frames: vbr_num_frames,
+      vbr_num_bytes: vbr_num_bytes
+  }
 end  
 
 
@@ -122,22 +146,29 @@ def read_title title
     # 16-19
 
     case 
-    when title[16].to_i == 0 && title[17].to_i == 0 && title[18].to_i == 0 && title[19].to_i == 0
+    when title[16].to_i == 0 && title[17].to_i == 0 && 
+          title[18].to_i == 0 && title[19].to_i == 0
       bitrate_index = 0
-    when title[16].to_i == 0 && title[17].to_i == 0 && title[18].to_i == 0 && title[19].to_i == 1
+    when title[16].to_i == 0 && title[17].to_i == 0 && 
+        title[18].to_i == 0 && title[19].to_i == 1
       bitrate_index = 32
-    when title[16].to_i == 0 && title[17].to_i == 0 && title[18].to_i == 1 && title[19].to_i == 0
+    when title[16].to_i == 0 && title[17].to_i == 0 && 
+        title[18].to_i == 1 && title[19].to_i == 0
       bitrate_index = 64
-    when title[16].to_i == 0 && title[17].to_i == 0 && title[18].to_i == 1 && title[19].to_i == 1
+    when title[16].to_i == 0 && title[17].to_i == 0 && 
+        title[18].to_i == 1 && title[19].to_i == 1
       bitrate_index = 96
-     when title[16].to_i == 0 && title[17].to_i == 1 && title[18].to_i == 0 && title[19].to_i == 0
+     when title[16].to_i == 0 && title[17].to_i == 1 && 
+          title[18].to_i == 0 && title[19].to_i == 0
        bitrate_index = 128
-    when title[16].to_i == 1 && title[17].to_i == 1 && title[18].to_i == 1 && title[19].to_i == 0
+    when title[16].to_i == 1 && title[17].to_i == 1 && 
+          title[18].to_i == 1 && title[19].to_i == 0
       bitrate_index = 320
-    when title[16].to_i == 1 && title[17].to_i == 1 && title[18].to_i == 1 && title[19].to_i == 1
-      bitrate_index = 0
+    when title[16].to_i == 1 && title[17].to_i == 1 && 
+          title[18].to_i == 1 && title[19].to_i == 1
+      bitrate_index = -1
     else
-      bitrate_index = 0
+      bitrate_index = -2
     end
 
     # sampling_rate_index

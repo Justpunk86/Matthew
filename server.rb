@@ -6,7 +6,7 @@ require 'socket'
 
 # @@stream_data = 
 
-server = TCPServer.open 2000
+ server = TCPServer.open 2000
 
 # tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3']
   # tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Red Hot Chili Peppers - 01 Under The Bridge (Album Version).mp3']
@@ -20,88 +20,70 @@ class Playlist
   end
 end
 
-loop {
-  
+@tracks = get_playlist
 
-  client = server.accept
-  # method, request_target, _http_version = client.gets.strip.split
-  # headers = {}
+@curr_sec = 0
 
-  # until (line = client.gets) =~ /^\r?\n$/
-  #   name, value = line.strip.split(': ')
-  #    headers[name] = value
-  # end
+@data_track_seconds = []
 
-  # if method.upcase == 'GET'
-    client.write "HTTP/1.1 200\r\n"
-    client.write "Access-Control-Allow-Origin: *\r\n"
-    client.write "\r\n"
-  # end
+# Socket.tcp_server_loop("localhost", 2000) {
+loop{  
+  # Thread.new {
+     client = server.accept
+    # method, request_target, _http_version = client.gets.strip.split
+    # headers = {}
 
-  # @tracks = Playlist.new.get_t
-
-  # while (@tracks.length != 0) do
-  # # tracks.each do |track|
-     
-  #   # download_sleep track
-
-    if(@tracks.length != 0)
-    
-        
-      # data_track =  File.open(@tracks.shift, "r:binary")
-      data_track = get_data_track_second get_track @tracks.shift
-
-      n = 0
-
-      # client.write data_track.read(417600)
-      # client.flush
-          
-
-      data_track.each do |fr|
-        # puts fr
-        n += 1
-        # puts fr.to_s
-        client.write fr
-        client.flush
-        sleep(0.026)
-
-        break if n == 3
-      end
-
-      # start = 0
-      # offset = 4096
-      # # start = start + offset
-      # step = 1044
-     
-      # 1.upto(10199) do |fr|
-
-        
-
-      #   # puts fr
-      #    n += 1
-        
-      #   client.write IO.read(data_track,step,start+offset)
-      #    # puts IO.read(out,step,start)
-
-      #   client.flush
-      #   start += step
-      #   # start = offset + fr * step
-      #   sleep(0.026)
-      #   # puts "#{n += 1}"
-      #    break if n == 10
-      # end
-        
-  
-      # duration = get_track_duration data_track
-      # client.write "current_time = #{duration-100}"
-      # sleep(duration*0.03)
+    # until (line = client.gets) =~ /^\r?\n$/
+    #   name, value = line.strip.split(': ')
+    #    headers[name] = value
     # end
 
-  else
-    @tracks = get_playlist
-  end
+    # if method.upcase == 'GET'
+      client.write "HTTP/1.1 200\r\n"
+      client.write "Access-Control-Allow-Origin: *\r\n"
+      client.write "\r\n"
+    # end
+  
+
+    while (@tracks.length != 0) do
+       
+      # if(@tracks.length != 0)
+
+
+      curr_track = @tracks.shift
+
+      puts curr_track
+        
+      # data_track =  File.open(@tracks.shift, "r:binary")
+      data_track = get_track curr_track
+      @data_track_seconds = get_data_track_second data_track
+      duration = get_track_duration data_track
+
+      puts duration
+
+      while (@data_track_seconds.length != 0) do
+
+      # data_track_seconds.each do |sec|
+        # @curr_sec = data_track_seconds.index(sec)
+        @curr_sec = @data_track_seconds.shift
+        client.write @curr_sec
+        client.flush
+        # sleep(0.026)
+
+        # break if n == duration
+      # end
+      end
+
+      sleep(duration)
+
+      # else
+      #   @tracks = get_playlist
+      # end
+      # end while
+    end
 
     client.close
+  # }
 }
 
 

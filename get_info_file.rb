@@ -1,20 +1,10 @@
 require './get_frame_info'
 require 'io/console'
 
-@playlist_dir = '/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3' 
-
-@tracks = []
-
  # module TestModule
 
-  def mytest
-    puts 'hello'
-    sleep(3)
-  end
-
-
 def get_playlist
-  tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3' ]
+  tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Anacondaz - Перезвони мне +79995771202 (2021)/*.mp3']
 end
 
  # end
@@ -25,30 +15,9 @@ end
   end
 
   def get_track track
-    # start = 4096
-    # step = 1044 * 40
 
-    # if(tracks.length != 0)
-
-    #   track = tracks.shift
     f = File.open(track, "r:binary")
-    # data_file = []
-      # f = File.open(track, "r:utf-8")
-      # f = IO.binread(track)
     track_data = f.read
-      
-    # else
-    #   data_file = nil
-    # end
-    
-    # new_io = IO.new(1, "w")
-    # data_file.bytes {|b| new_io.write b }
-
-    # 0.upto(10198) do |fr|
-    #     data_file[fr] = IO.read(f,step,start)
-    #     start += step
-    # end
-    
     f.close
     
     return track_data
@@ -56,25 +25,20 @@ end
 
   def get_track_duration track_data
 
-    # f = File.open(track, "r:binary")
-
-    # data_file = track_data
-
-    # file_size = data_file.bytes.count
-    
     track_props = get_audio_props track_data
 
-    # # Duration = Number of Frames * Samples Per Frame / Sampling Rate
+    #Duration = File Size / Bitrate * 8
 
-    duration = track_props[:vbr_num_frames] * 
-        track_props[:samples_per_frame] / 
-        track_props[:sampling_rate_index]
+    duration = (track_data.size - track_props[:id3v2_length] -128) / 
+                (track_props[:bitrate_index] * 1000) * 8
+
+    #Duration = Number of Frames * Samples Per Frame / Sampling Rate
+
+    # duration = track_props[:vbr_num_frames] * 
+    #     track_props[:samples_per_frame] / 
+    #     track_props[:sampling_rate_index]
 
     duration.round(2)
-
-    # hash_props.each do |props|
-    #   puts props.inspect
-    # end
 
   end   
 
@@ -116,32 +80,20 @@ end
 
     data_file = []
 
-    #  0.upto(10198) do |fr|
-    #     data_file[fr] = IO.read(f,step,start)
-    #     start += step
-    # end
-
     # Нужно записать в массив данные по секундам
 
     vbr_num_frames
 
-    c = 0
-    title_byte = ''
-    # puts track_data.length
-    
+    # c = 0
 
     next_start = start_play
     next_end = start_play + step
 
     loop {
 
-      
-
         # puts c
-
         # puts next_start
         # puts next_end
-      
 
       data_file.push track_data.byteslice(next_start..next_end)
 
@@ -149,47 +101,36 @@ end
       next_end = next_end + step
 
         # puts data_file[c].length
-
         # c += 1
-
-
         # break if c == 2
 
       break if track_data.length <= next_end
-
     }
-
-    
-      # puts data_file[266]
-
-      # puts data_file[266].length
-
-      # puts data_file.length
-
-        
-    # puts "#{frame_length_in_bytes} <===> #{frame_length_in_bytes_2}"
-    # "frame_length_in_bytes = #{frame_length_in_bytes}, 
-    # one_second = #{bytes_one_second},
-    # frames_one_second = #{frames_one_second},
-    # step = #{step},
-    # track_size = #{track_data.bytes.count - 4096 - 128},
-    # c_fr = #{c_fr},
-    # data_file = #{data_file[1]}"
-    
+  
     data_file
-
   end
 
 
-
 # include TestModule
+   # @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/The Red Hot Chili Peppers - Dani California.mp3'] 
+  # @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Red Hot Chili Peppers - 01 Under The Bridge (Album Version).mp3'] 
 
- # @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3']
- #  @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Red Hot Chili Peppers - 01 Under The Bridge (Album Version).mp3'] 
+     # @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3']
+   #   @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Anacondaz - Перезвони мне +79995771202 (2021)/03. SOS.mp3']
+  
 
- #   @tracks.each do |track|
- 
- #    # puts get_audio_props get_track track
- #    get_data_track_second get_track track
+   # @tracks.each do |track|
+    
+   # #  #  f = File.open(track, "r:binary")
+   # #  # # ff = f.read
+   # #  # # id3v2_length = get_id3v2_length ff
+   # #  #  t = IO.read(f,4,67806)
+   # #  # # #f.read(70000)
+   # #  #   puts t
+   # #  #   puts get_audio_props get_track track
+   # #  # get_data_track_second get_track track
+   #   puts get_track_duration get_track track
+   # #     # get_id3v2_length get_track track
+   # #     # puts "==============="
 
- #   end 
+   # end 
