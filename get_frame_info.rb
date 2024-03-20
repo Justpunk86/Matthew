@@ -28,6 +28,7 @@ def get_audio_props f
   end
 
   res1[:samples_per_frame] = 1152
+  res1[:id3v2_length] = id3v2_length
 
   res1
 
@@ -85,10 +86,11 @@ def read_title title
   h = {}
   
   audio_version_id = ''
-  layer_index = ''
-  bitrate_index = ''
-  sampling_rate_index = ''
+  layer_index = 0
+  bitrate_index = 0
+  sampling_rate_index = 0
   channel_mode = ''
+  padding = 0
 
   # get audio version id MPEG
       # 11-12
@@ -107,13 +109,13 @@ def read_title title
       # 13-14
     case 
     when title[13].to_i == 0 && title[14].to_i == 0
-      layer_index = 'NONE'
+      layer_index = 0
     when title[13].to_i == 0 && title[14].to_i == 1
-      layer_index = '3'
+      layer_index = 3
     when title[13].to_i == 1 && title[14].to_i == 0
-      layer_index = '2'
+      layer_index = 2
      when title[13].to_i == 1 && title[14].to_i == 1
-       layer_index = '1'
+       layer_index = 1
     end
 
     # get bitrate_index
@@ -121,35 +123,39 @@ def read_title title
 
     case 
     when title[16].to_i == 0 && title[17].to_i == 0 && title[18].to_i == 0 && title[19].to_i == 0
-      bitrate_index = 'NONE'
+      bitrate_index = 0
     when title[16].to_i == 0 && title[17].to_i == 0 && title[18].to_i == 0 && title[19].to_i == 1
-      bitrate_index = '32'
+      bitrate_index = 32
     when title[16].to_i == 0 && title[17].to_i == 0 && title[18].to_i == 1 && title[19].to_i == 0
-      bitrate_index = '64'
+      bitrate_index = 64
     when title[16].to_i == 0 && title[17].to_i == 0 && title[18].to_i == 1 && title[19].to_i == 1
-      bitrate_index = '96'
+      bitrate_index = 96
      when title[16].to_i == 0 && title[17].to_i == 1 && title[18].to_i == 0 && title[19].to_i == 0
-       bitrate_index = '128'
+       bitrate_index = 128
     when title[16].to_i == 1 && title[17].to_i == 1 && title[18].to_i == 1 && title[19].to_i == 0
-      bitrate_index = '320'
+      bitrate_index = 320
     when title[16].to_i == 1 && title[17].to_i == 1 && title[18].to_i == 1 && title[19].to_i == 1
-      bitrate_index = 'NONE'
+      bitrate_index = 0
     else
-      bitrate_index = 'other'
+      bitrate_index = 0
     end
 
     # sampling_rate_index
     # 20-21
     case 
     when title[20].to_i == 0 && title[21].to_i == 0 
-      sampling_rate_index = '44100'
+      sampling_rate_index = 44100
     when title[20].to_i == 0 && title[21].to_i == 1 
-      sampling_rate_index = '48000'
+      sampling_rate_index = 48000
     when title[20].to_i == 1 && title[21].to_i == 0 
-      sampling_rate_index = '32000'
+      sampling_rate_index = 32000
      when title[20].to_i == 1 && title[21].to_i == 1 
-       sampling_rate_index = 'NONE'
+       sampling_rate_index = 0
     end
+
+    # padding
+    # 22
+    padding = 1 if title[22].to_i == 1
 
     #channel_mode
     # 24-25 bit
@@ -171,6 +177,7 @@ def read_title title
   h[:bitrate_index] = bitrate_index
   h[:sampling_rate_index] = sampling_rate_index
   h[:channel_mode] = channel_mode
+  h[:padding] = padding
 
   return h
     

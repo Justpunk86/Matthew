@@ -49,7 +49,7 @@ loop {
     
         
       # data_track =  File.open(@tracks.shift, "r:binary")
-      data_track = get_track @tracks.shift
+      data_track = get_data_track_second get_track @tracks.shift
 
       n = 0
 
@@ -60,7 +60,8 @@ loop {
       data_track.each do |fr|
         # puts fr
         n += 1
-        client.write fr.to_s
+        # puts fr.to_s
+        client.write fr
         client.flush
         sleep(0.026)
 
