@@ -4,10 +4,19 @@ require 'io/console'
  # module TestModule
 
 def get_playlist
-  tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Anacondaz - Перезвони мне +79995771202 (2021)/*.mp3']
+  # tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Anacondaz - Перезвони мне +79995771202 (2021)/*.mp3']
+  tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3']
 end
 
  # end
+
+  def get_seconds tracks
+    data_track_seconds = []
+    tracks.each do |track|
+      data_track = get_track track
+      data_track_seconds.push get_data_track_second data_track
+    end
+  end
 
   def download_sleep track
     duration = get_track_duration track
@@ -115,22 +124,25 @@ end
    # @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/The Red Hot Chili Peppers - Dani California.mp3'] 
   # @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Red Hot Chili Peppers - 01 Under The Bridge (Album Version).mp3'] 
 
-     # @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/*.mp3']
-   #   @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Anacondaz - Перезвони мне +79995771202 (2021)/03. SOS.mp3']
+# @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Anacondaz - Перезвони мне +79995771202 (2021)/02. Серым.mp3']
+# @tracks = Dir['/home/se/Documents/projects/HDT RADIO ONE/tracks/Anacondaz - Перезвони мне +79995771202 (2021)/01. Когда-нибудь.mp3']
   
 
-   # @tracks.each do |track|
+  #  @tracks.each do |track|
     
-   # #  #  f = File.open(track, "r:binary")
-   # #  # # ff = f.read
-   # #  # # id3v2_length = get_id3v2_length ff
-   # #  #  t = IO.read(f,4,67806)
-   # #  # # #f.read(70000)
-   # #  #   puts t
-   # #  #   puts get_audio_props get_track track
-   # #  # get_data_track_second get_track track
-   #   puts get_track_duration get_track track
-   # #     # get_id3v2_length get_track track
-   # #     # puts "==============="
+  #  # #  #  f = File.open(track, "r:binary")
+  #  # #  # # ff = f.read
+  #  # #  # # id3v2_length = get_id3v2_length ff
+  #  # #  #  t = IO.read(f,4,67806)
+  #  # #  # # #f.read(70000)
+  #  # #  #   puts t
 
-   # end 
+  # puts get_audio_props get_track track
+  
+  # puts (get_data_track_second (get_track track)).length
+
+  #    #   puts get_track_duration get_track track
+  #  # #     # get_id3v2_length get_track track
+  #  # #     # puts "==============="
+
+  #  end 
