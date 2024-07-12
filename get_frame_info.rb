@@ -25,6 +25,7 @@ def get_audio_props f
 
   res1[:samples_per_frame] = 1152
   res1[:id3v2_length] = id3v2_length
+  res1[:track_size] = f.length
 
   res1
     
